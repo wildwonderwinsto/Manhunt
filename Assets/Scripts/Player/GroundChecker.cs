@@ -27,6 +27,11 @@ namespace Game.Player
         private float _sphereRadius = 0.28f;
 
         [SerializeField]
+        [Range(0.3f, 1f)]
+        [Tooltip("Height above ground where sphere cast begins")]
+        private float _castOriginHeight = 0.5f;
+
+        [SerializeField]
         [Tooltip("Vertical offset from player position where the sphere is centered (negative = below player)")]
         private float _heightOffset = -0.14f;
         #endregion
@@ -72,11 +77,11 @@ namespace Game.Player
         private void CheckGround()
         {
             // Start the sphere cast slightly above the feet
-            Vector3 castOrigin = transform.position + Vector3.up * 0.5f;
+            Vector3 castOrigin = transform.position + Vector3.up * _castOriginHeight;
 
             // Distance the sphere must travel to reach the "feet + offset" height
             // The sphere's CENTER travels this distance
-            float castDistance = 0.5f - _heightOffset;
+            float castDistance = _castOriginHeight - _heightOffset;
 
             // Perform the downward sphere cast
             if (Physics.SphereCast(
@@ -106,6 +111,8 @@ namespace Game.Player
 
         private void OnDrawGizmosSelected()
         {
+            if (!isActiveAndEnabled) return;
+
             // Visualize the ground detection sphere
             Vector3 sphereCenter = transform.position + Vector3.up * _heightOffset;
             Gizmos.color = IsGrounded ? Color.green : Color.red;

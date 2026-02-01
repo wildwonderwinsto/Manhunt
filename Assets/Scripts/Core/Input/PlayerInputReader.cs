@@ -89,8 +89,9 @@ namespace Game.Core.Input
         /// </summary>
         public void OnMove(InputAction.CallbackContext context)
         {
+            if (context.action == null) return;
             MoveInput = context.ReadValue<Vector2>();
-            MoveInputChanged.Invoke(MoveInput);
+            MoveInputChanged?.Invoke(MoveInput);
         }
 
         /// <summary>
@@ -99,46 +100,56 @@ namespace Game.Core.Input
         /// </summary>
         public void OnLook(InputAction.CallbackContext context)
         {
+            if (context.action == null) return;
             LookInput = context.ReadValue<Vector2>();
-            LookInputChanged.Invoke(LookInput);
+            LookInputChanged?.Invoke(LookInput);
         }
 
         /// <summary>Jump input handler with phase detection for variable jump height.</summary>
         public void OnJump(InputAction.CallbackContext context)
         {
+            if (context.action == null) return;
             if (context.phase == InputActionPhase.Performed)
             {
                 IsJumpHeld = true;
-                JumpPressed.Invoke();
+                JumpPressed?.Invoke();
             }
             else if (context.phase == InputActionPhase.Canceled)
             {
                 IsJumpHeld = false;
-                JumpReleased.Invoke();
+                JumpReleased?.Invoke();
             }
         }
 
         /// <summary>Sprint input handler with phase detection.</summary>
         public void OnSprint(InputAction.CallbackContext context)
         {
+            if (context.action == null) return;
             if (context.phase == InputActionPhase.Performed)
             {
                 IsSprintHeld = true;
-                SprintPressed.Invoke();
+                SprintPressed?.Invoke();
             }
             else if (context.phase == InputActionPhase.Canceled)
             {
                 IsSprintHeld = false;
-                SprintReleased.Invoke();
+                SprintReleased?.Invoke();
             }
         }
 
-        // Unused action callbacks (required by IPlayerActions interface)
-        // These are reserved for future use or can be removed if the interface supports it
+        /// <summary>Reserved for future attack system implementation.</summary>
         public void OnAttack(InputAction.CallbackContext context) { }
+        
+        /// <summary>Reserved for future interaction system.</summary>
         public void OnInteract(InputAction.CallbackContext context) { }
+        
+        /// <summary>Reserved for future crouch system implementation.</summary>
         public void OnCrouch(InputAction.CallbackContext context) { }
+        
+        /// <summary>Reserved for future weapon selection system.</summary>
         public void OnPrevious(InputAction.CallbackContext context) { }
+        
+        /// <summary>Reserved for future weapon selection system.</summary>
         public void OnNext(InputAction.CallbackContext context) { }
 
         #endregion

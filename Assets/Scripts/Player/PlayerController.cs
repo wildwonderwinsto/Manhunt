@@ -28,6 +28,11 @@ namespace Game.Player
         [Tooltip("Friction applied to movement on slopes (0 = no friction, 1 = full friction)")]
         private float _slopeFriction = 0.5f;
 
+        [SerializeField]
+        [Range(5f, 30f)]
+        [Tooltip("Maximum speed when sliding down steep slopes")]
+        private float _maxSlideSpeed = 15f;
+
         // Sub-components
         private CharacterController _characterController;
         private PlayerMover _mover;
@@ -108,14 +113,16 @@ namespace Game.Player
                 Vector3 slideDir = Vector3.ProjectOnPlane(Vector3.down, _groundChecker.GroundNormal).normalized;
                 
                 // Calculate slide speed based on slope angle
-                float slideSpeed = 15f * (_groundChecker.SlopeAngle / 90f); 
+                float slideSpeed = _maxSlideSpeed * (_groundChecker.SlopeAngle / 90f); 
                 
                 // Apply friction to slide (so player doesn't accelerate forever)
                 float friction = Mathf.Lerp(1f, 0.3f, _slopeFriction);
                 _currentMomentum = Vector3.Lerp(_currentMomentum, slideDir * slideSpeed, friction * Time.deltaTime);
                 
                 // Debug visualization
+#if UNITY_EDITOR
                 Debug.DrawRay(transform.position, _currentMomentum, Color.blue);
+#endif
                 
                 _wasOnSteepSlopeLastFrame = true;
             }

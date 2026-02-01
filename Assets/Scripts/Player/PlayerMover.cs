@@ -66,6 +66,8 @@ namespace Game.Player
         /// <summary>Current horizontal velocity (XZ plane only). Y is handled by gravity system.</summary>
         private Vector3 _horizontalVelocity = Vector3.zero;
 
+        private const float EPSILON = 0.001f;  // Zero threshold for velocity checks
+
         #endregion
 
         #region Public API
@@ -136,7 +138,7 @@ namespace Game.Player
         private Vector3 ApplyFriction(Vector3 velocity)
         {
             float speed = velocity.magnitude;
-            if (speed < 0.001f) return Vector3.zero; // Already stopped
+            if (speed < EPSILON) return Vector3.zero; // Already stopped
 
             // Calculate how much speed to lose this frame
             float control = (speed < _stopSpeed) ? _stopSpeed : speed;
@@ -165,7 +167,7 @@ namespace Game.Player
             Vector3 wishDirection = CalculateWishDirection(input, cameraTransform);
 
             // No input = no acceleration
-            if (wishDirection.sqrMagnitude < 0.001f)
+            if (wishDirection.sqrMagnitude < EPSILON)
                 return velocity;
 
             // 2. How fast do we want to go in that direction?
