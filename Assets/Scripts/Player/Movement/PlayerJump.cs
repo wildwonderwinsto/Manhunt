@@ -6,18 +6,15 @@ public class PlayerJump : MonoBehaviour
     [SerializeField, Tooltip("Instant jump response - sets velocity.y directly")]
     private float jumpForce = 5f;
     
-    [SerializeField, Tooltip("Grace period to jump after leaving ground")]
-    private float coyoteTime = 0.1f;
+    [SerializeField, Tooltip("Number of physics frames of grace after leaving ground")]
+    private int coyoteFrames = 5; // ✅ This is the actual setting used
 
     private Rigidbody rb;
     private GroundCheck groundCheck;
     private PlayerMovement playerMovement;
     private PlayerInputReader inputReader;
     
-    
-    private Vector3 jumpVelocity; // Cached to avoid allocation
-
-    private int coyoteFrames = 5; // Explicit: "5 physics frames of grace"
+    private Vector3 jumpVelocity;
     private int framesSinceGrounded = 999;
 
     private void Awake()
@@ -32,7 +29,6 @@ public class PlayerJump : MonoBehaviour
     {
         if (inputReader == null) return;
 
-        // Track frames since grounded
         if (groundCheck.IsGrounded(rb))
         {
             framesSinceGrounded = 0;
@@ -42,12 +38,10 @@ public class PlayerJump : MonoBehaviour
             framesSinceGrounded++;
         }
 
-        // Process jump when button is pressed
         if (inputReader.JumpPressed)
         {
             inputReader.ConsumeJump();
             
-            // Allow jump if within coyote frames
             if (framesSinceGrounded <= coyoteFrames)
             {
                 jumpVelocity = rb.linearVelocity;
