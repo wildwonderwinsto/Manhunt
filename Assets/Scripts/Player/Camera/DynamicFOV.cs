@@ -38,24 +38,19 @@ public class DynamicFOV : MonoBehaviour
         currentSpeed = hVel.magnitude;
     }
 
-    private void LateUpdate()
+    void LateUpdate()
     {
         if (cam == null || playerRigidbody == null) return;
 
-        // Calculate horizontal speed (ignore Y velocity) - NO ALLOCATION
-        horizontalVelocity.Set(playerRigidbody.linearVelocity.x, 0f, playerRigidbody.linearVelocity.z);
-        float speed = horizontalVelocity.magnitude;
-
-        // Determine target FOV based on speed thresholds
+        // Use ONLY the cached speed from FixedUpdate
         float targetFOV;
-    if (currentSpeed < 7f)
-        targetFOV = baseFOV;
-        else if (speed <= 10f)
+        if (currentSpeed < 7f)
+            targetFOV = baseFOV;
+        else if (currentSpeed <= 10f)  // Changed from 'speed' to 'currentSpeed'
             targetFOV = sprintFOV;
         else
             targetFOV = maxFOV;
 
-        // Smoothly lerp to target FOV (frame-rate independent)
         cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, Time.deltaTime * fovLerpSpeed);
     }
 }

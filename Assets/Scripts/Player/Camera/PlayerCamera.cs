@@ -38,18 +38,19 @@ public class PlayerCamera : MonoBehaviour
     }
 
         private void LateUpdate()
-    {
-        float mouseX = lookInput.x * mouseSensitivity;
-        float mouseY = lookInput.y * mouseSensitivity;
-        
-        // Accumulate for physics to consume
-        accumulatedHorizontalInput += mouseX;
-        
-        // Camera rotation happens immediately in LateUpdate (correct)
-        verticalRotation -= mouseY;
-        verticalRotation = Mathf.Clamp(verticalRotation, -90f, 90f);
-        transform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
-    }
+        {
+            if (inputReader == null) return; // Add null check
+            
+            Vector2 lookInput = inputReader.LookInput; // Declare variable
+            float mouseX = lookInput.x * mouseSensitivity;
+            float mouseY = lookInput.y * mouseSensitivity;
+            
+            accumulatedHorizontalInput += mouseX;
+            
+            verticalRotation -= mouseY;
+            verticalRotation = Mathf.Clamp(verticalRotation, -90f, 90f);
+            transform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
+        }
 
     public float ConsumeHorizontalInput()
     {
@@ -58,7 +59,6 @@ public class PlayerCamera : MonoBehaviour
         return input;
     }
 
-    // PlayerMovement.FixedUpdate():
-    float horizontalLookInput = playerCamera.ConsumeHorizontalInput();
+    
 
 }

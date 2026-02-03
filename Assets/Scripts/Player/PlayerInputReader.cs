@@ -9,6 +9,8 @@ public class PlayerInputReader : MonoBehaviour
     public bool SprintHeld { get; private set; }
     public bool CrouchPressed { get; private set; }
 
+    private float lastJumpPressTime;
+
     void OnMove(InputValue value) => MoveInput = value.Get<Vector2>();
     void OnLook(InputValue value) => LookInput = value.Get<Vector2>();
     void OnJump(InputValue value) => JumpPressed = value.isPressed;

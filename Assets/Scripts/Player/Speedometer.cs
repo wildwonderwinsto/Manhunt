@@ -4,8 +4,16 @@ public class Speedometer : MonoBehaviour
 {
     private Rigidbody rb;
     private float displaySpeed;
+    private GUIStyle style;
 
-    void Start() => rb = GetComponent<Rigidbody>();
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        
+        style = new GUIStyle();
+        style.fontSize = 40;
+        style.normal.textColor = Color.white;
+    }
 
     void FixedUpdate()
     {

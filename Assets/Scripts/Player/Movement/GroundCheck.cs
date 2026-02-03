@@ -22,18 +22,17 @@ public class GroundCheck : MonoBehaviour
     }
 
     void FixedUpdate() // Add to GroundCheck
-{
-    physicsPosition = transform.position;
-}
+    {
+        physicsPosition = transform.position;
+    }
 
-    public bool IsGrounded()
+    public bool IsGrounded(Rigidbody rb)
     {
         if (capsuleCollider == null) return false;
-
-        // Calculate bottom center of capsule
-        capsuleBottom = physicsPosition + Vector3.down * (capsuleCollider.height / 2f - capsuleCollider.radius);
-
-        // Perform sphere cast downward and cache result
+        
+        // Use Rigidbody.position directly (guaranteed to be physics position)
+        capsuleBottom = rb.position + Vector3.down * (capsuleCollider.height / 2f - capsuleCollider.radius);
+        
         isGroundedCached = Physics.SphereCast(capsuleBottom, capsuleRadius, Vector3.down, out _, checkDistance, groundLayer);
         return isGroundedCached;
     }

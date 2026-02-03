@@ -14,7 +14,7 @@ public class PlayerJump : MonoBehaviour
     private PlayerMovement playerMovement;
     private PlayerInputReader inputReader;
     
-    private float lastGroundedTime;
+    
     private Vector3 jumpVelocity; // Cached to avoid allocation
 
     private int coyoteFrames = 5; // Explicit: "5 physics frames of grace"
@@ -33,7 +33,7 @@ public class PlayerJump : MonoBehaviour
         if (inputReader == null) return;
 
         // Track when we were last grounded for coyote time (use fixedTime for consistency)
-        if (groundCheck.IsGrounded())
+        if (groundCheck.IsGrounded(rb))
         {
             lastGroundedTime = Time.fixedTime;
             framesSinceGrounded = 0;

@@ -24,6 +24,10 @@ public class PlayerMovement : MonoBehaviour
     private const float MAX_MOMENTUM_STACKS = 3f;
     private float groundedTimer = 0f;
 
+    [SerializeField, Range(0.05f, 0.5f)] private float accelerationTime = 0.1f;
+    
+    
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -47,7 +51,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         #if UNITY_EDITOR
         if (rb.constraints != RigidbodyConstraints.FreezeRotation)
@@ -56,18 +60,21 @@ public class PlayerMovement : MonoBehaviour
             rb.constraints = RigidbodyConstraints.FreezeRotation;
         }
         #endif
+        
+        HandleRotation();     
+        HandleMovement();     
+        HandleMomentumDecay();
     }
+
 
     private void HandleRotation()
     {
         if (playerCamera == null) return;
 
-        // Get horizontal look input from camera (calculated in LateUpdate)
-        float horizontalLookInput = playerCamera.horizontalLookInput;
-
+        float horizontalLookInput = playerCamera.ConsumeHorizontalInput();
+        
         if (horizontalLookInput != 0f)
         {
-            // Make it explicit that this is a delta
             Quaternion rotationDelta = Quaternion.Euler(0f, horizontalLookInput, 0f);
             Quaternion targetRotation = rb.rotation * rotationDelta;
             rb.MoveRotation(targetRotation);
@@ -100,7 +107,7 @@ public class PlayerMovement : MonoBehaviour
         currentVelocity.Set(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         
         // Frame-rate independent acceleration (60fps baseline)
-        float lerpFactor = 1f - Mathf.Exp(-1f / acceleration * Time.fixedDeltaTime);
+        float lerpFactor = 1f - Mathf.Exp(-Time.fixedDeltaTime / accelerationTime);
         newVelocity = Vector3.Lerp(currentVelocity, targetVelocity, lerpFactor);
         
         rb.linearVelocity = new Vector3(newVelocity.x, rb.linearVelocity.y, newVelocity.z);
