@@ -6,27 +6,28 @@ public class DynamicFOV : MonoBehaviour
     [SerializeField] private float baseFOV = 60f;
     [SerializeField] private float sprintFOV = 70f;
     [SerializeField] private float maxFOV = 80f;
-    [SerializeField] private float fovLerpSpeed = 10f; // Increased for smoother high-fps
+    [SerializeField] private float fovLerpSpeed = 10f;
+
+    [Header("References")]
+    [SerializeField] private Rigidbody playerRigidbody; // ✅ Assign in Inspector
+    [SerializeField] private PlayerMovement playerMovement; // ✅ Assign in Inspector
 
     private Camera cam;
-    private Rigidbody playerRigidbody;
-    private PlayerMovement playerMovement;
     private Vector3 horizontalVelocity; // Cached to avoid allocation
 
     private void Start()
     {
         cam = GetComponent<Camera>();
         
-        // Find player by tag
-        GameObject player = GameObject.FindWithTag("Player");
-        if (player != null)
+        // Validate references
+        if (playerRigidbody == null)
         {
-            playerRigidbody = player.GetComponent<Rigidbody>();
-            playerMovement = player.GetComponent<PlayerMovement>();
+            Debug.LogError("DynamicFOV: Player Rigidbody reference is missing! Assign in Inspector.");
         }
-        else
+        
+        if (playerMovement == null)
         {
-            Debug.LogWarning("DynamicFOV: Player GameObject not found! Ensure Player has 'Player' tag.");
+            Debug.LogWarning("DynamicFOV: PlayerMovement reference is missing.");
         }
     }
 
@@ -39,7 +40,6 @@ public class DynamicFOV : MonoBehaviour
         float speed = horizontalVelocity.magnitude;
 
         // Determine target FOV based on speed thresholds
-        // Note: These match PlayerMovement walkSpeed=7, sprintSpeed=10, momentum adds up to 1.5
         float targetFOV;
         if (speed < 7f)
             targetFOV = baseFOV;

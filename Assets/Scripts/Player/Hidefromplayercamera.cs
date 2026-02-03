@@ -1,57 +1,33 @@
 using UnityEngine;
 
-/// <summary>
-/// Hides this GameObject AND all children from the camera tagged "PlayerCamera" using layers
-/// Also ensures MeshRenderer is enabled if found
-/// 
-/// SETUP:
-/// 1. Create a new Layer called "HiddenFromPlayer"
-/// 2. Attach this script to ANY object in your hierarchy (parent, child, or the mesh object itself)
-/// 3. Set the hiddenLayer to "HiddenFromPlayer" in the inspector
-/// 4. Make sure your camera has the tag "PlayerCamera"
-/// 
-/// IMPORTANT: This will set the layer on the GameObject AND all its children recursively
-/// </summary>
 public class HideFromPlayerCamera : MonoBehaviour
 {
     [Header("Layer Settings")]
     [Tooltip("Layer to use for hiding from player camera")]
     [SerializeField] private string hiddenLayer = "HiddenFromPlayer";
 
+    [Header("References")]
+    [Tooltip("Assign the PlayerCamera in the Inspector")]
+    [SerializeField] private Camera playerCamera; // ✅ Direct reference
+
     [Header("Options")]
     [Tooltip("Should we set the layer on all children too?")]
     [SerializeField] private bool applyToChildren = true;
 
-    private Camera playerCamera;
     private int layerIndex;
-
-    private void Awake()
-    {
-        FindPlayerCamera();
-    }
 
     private void Start()
     {
+        // Validate camera reference
+        if (playerCamera == null)
+        {
+            Debug.LogError("[HideFromPlayerCamera] PlayerCamera reference is missing! Assign in Inspector.");
+            return;
+        }
+
         SetupLayer();
         ConfigureCameraCulling();
         EnsureMeshRenderersEnabled();
-    }
-
-    private void FindPlayerCamera()
-    {
-        GameObject cameraObj = GameObject.FindGameObjectWithTag("PlayerCamera");
-        if (cameraObj != null)
-        {
-            playerCamera = cameraObj.GetComponent<Camera>();
-            if (playerCamera == null)
-            {
-                Debug.LogError("[HideFromPlayerCamera] 'PlayerCamera' tag found but no Camera component!");
-            }
-        }
-        else
-        {
-            Debug.LogError("[HideFromPlayerCamera] No GameObject with tag 'PlayerCamera' found!");
-        }
     }
 
     private void SetupLayer()
