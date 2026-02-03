@@ -10,6 +10,7 @@ public class GroundCheck : MonoBehaviour
     private float capsuleRadius;
     private Vector3 capsuleBottom;
     private bool isGroundedCached; // Cache for gizmos
+    private Vector3 physicsPosition;
 
     private void Awake()
     {
@@ -20,12 +21,17 @@ public class GroundCheck : MonoBehaviour
         }
     }
 
+    void FixedUpdate() // Add to GroundCheck
+{
+    physicsPosition = transform.position;
+}
+
     public bool IsGrounded()
     {
         if (capsuleCollider == null) return false;
 
         // Calculate bottom center of capsule
-        capsuleBottom = transform.position + Vector3.down * (capsuleCollider.height / 2f - capsuleCollider.radius);
+        capsuleBottom = physicsPosition + Vector3.down * (capsuleCollider.height / 2f - capsuleCollider.radius);
 
         // Perform sphere cast downward and cache result
         isGroundedCached = Physics.SphereCast(capsuleBottom, capsuleRadius, Vector3.down, out _, checkDistance, groundLayer);

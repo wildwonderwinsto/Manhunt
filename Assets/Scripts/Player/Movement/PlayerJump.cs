@@ -17,6 +17,9 @@ public class PlayerJump : MonoBehaviour
     private float lastGroundedTime;
     private Vector3 jumpVelocity; // Cached to avoid allocation
 
+    private int coyoteFrames = 5; // Explicit: "5 physics frames of grace"
+    private int framesSinceGrounded = 999;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -33,6 +36,11 @@ public class PlayerJump : MonoBehaviour
         if (groundCheck.IsGrounded())
         {
             lastGroundedTime = Time.fixedTime;
+            framesSinceGrounded = 0;
+        }
+        else
+        {
+            framesSinceGrounded++;
         }
 
         // Process jump when button is pressed
@@ -43,7 +51,7 @@ public class PlayerJump : MonoBehaviour
             float timeSinceGrounded = Time.fixedTime - lastGroundedTime;
             
             // Allow jump if grounded or within coyote time
-            if (timeSinceGrounded <= coyoteTime)
+            if (framesSinceGrounded <= coyoteFrames)
             {
                 // Instant jump - set velocity.y directly (NO ALLOCATION)
                 jumpVelocity = rb.linearVelocity;

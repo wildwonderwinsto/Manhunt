@@ -14,6 +14,7 @@ public class DynamicFOV : MonoBehaviour
 
     private Camera cam;
     private Vector3 horizontalVelocity; // Cached to avoid allocation
+    private float currentSpeed;
 
     private void Start()
     {
@@ -31,6 +32,12 @@ public class DynamicFOV : MonoBehaviour
         }
     }
 
+    void FixedUpdate()
+    {
+        Vector3 hVel = new Vector3(playerRigidbody.linearVelocity.x, 0f, playerRigidbody.linearVelocity.z);
+        currentSpeed = hVel.magnitude;
+    }
+
     private void LateUpdate()
     {
         if (cam == null || playerRigidbody == null) return;
@@ -41,8 +48,8 @@ public class DynamicFOV : MonoBehaviour
 
         // Determine target FOV based on speed thresholds
         float targetFOV;
-        if (speed < 7f)
-            targetFOV = baseFOV;
+    if (currentSpeed < 7f)
+        targetFOV = baseFOV;
         else if (speed <= 10f)
             targetFOV = sprintFOV;
         else

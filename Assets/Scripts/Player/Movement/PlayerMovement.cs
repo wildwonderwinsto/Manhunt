@@ -47,11 +47,15 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    void FixedUpdate()
     {
-        HandleRotation();
-        HandleMovement();
-        HandleMomentumDecay();
+        #if UNITY_EDITOR
+        if (rb.constraints != RigidbodyConstraints.FreezeRotation)
+        {
+            Debug.LogError("Rigidbody constraints were modified! Resetting...");
+            rb.constraints = RigidbodyConstraints.FreezeRotation;
+        }
+        #endif
     }
 
     private void HandleRotation()
@@ -63,9 +67,10 @@ public class PlayerMovement : MonoBehaviour
 
         if (horizontalLookInput != 0f)
         {
-            // Rotate player body using physics (smoothly interpolated)
-            Quaternion deltaRotation = Quaternion.Euler(0f, horizontalLookInput, 0f);
-            rb.MoveRotation(rb.rotation * deltaRotation);
+            // Make it explicit that this is a delta
+            Quaternion rotationDelta = Quaternion.Euler(0f, horizontalLookInput, 0f);
+            Quaternion targetRotation = rb.rotation * rotationDelta;
+            rb.MoveRotation(targetRotation);
         }
     }
 
@@ -95,7 +100,7 @@ public class PlayerMovement : MonoBehaviour
         currentVelocity.Set(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         
         // Frame-rate independent acceleration (60fps baseline)
-        float lerpFactor = 1f - Mathf.Exp(-acceleration * 10f * Time.fixedDeltaTime);
+        float lerpFactor = 1f - Mathf.Exp(-1f / acceleration * Time.fixedDeltaTime);
         newVelocity = Vector3.Lerp(currentVelocity, targetVelocity, lerpFactor);
         
         rb.linearVelocity = new Vector3(newVelocity.x, rb.linearVelocity.y, newVelocity.z);

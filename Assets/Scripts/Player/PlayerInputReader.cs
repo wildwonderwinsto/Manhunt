@@ -15,7 +15,9 @@ public class PlayerInputReader : MonoBehaviour
     void OnSprint(InputValue value) => SprintHeld = value.isPressed;
     void OnCrouch(InputValue value) => CrouchPressed = value.isPressed;
 
-    // Call these to reset button states after consumption
-    public void ConsumeJump() => JumpPressed = false;
-    public void ConsumeCrouch() => CrouchPressed = false;
+        // Use InputAction.CallbackContext's timing info
+    public bool WasJumpPressedThisPhysicsStep()
+    {
+        return JumpPressed && lastJumpPressTime >= Time.fixedTime - Time.fixedDeltaTime;
+    }
 }

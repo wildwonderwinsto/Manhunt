@@ -10,7 +10,7 @@ public class PlayerCamera : MonoBehaviour
     private float verticalRotation = 0f;
     
     // Horizontal rotation stored for PlayerMovement to consume
-    [System.NonSerialized] public float horizontalLookInput = 0f;
+    private float accumulatedHorizontalInput = 0f;
 
     private void Awake()
     {
@@ -37,27 +37,28 @@ public class PlayerCamera : MonoBehaviour
         Cursor.visible = false;
     }
 
-    private void LateUpdate()
+        private void LateUpdate()
     {
-        // Early exit if required components are missing
-        if (inputReader == null) return;
-
-        // Read look input from InputReader
-        Vector2 lookInput = inputReader.LookInput;
-
-        // CORRECTED: Do NOT multiply mouse delta by Time.deltaTime
-        // Mouse input is already a delta (change per frame)
-        // Multiplying by deltaTime makes it framerate-dependent (bad!)
         float mouseX = lookInput.x * mouseSensitivity;
         float mouseY = lookInput.y * mouseSensitivity;
-
-        // Store horizontal input for PlayerMovement to apply via Rigidbody.MoveRotation
-        horizontalLookInput = mouseX;
-
-        // ONLY rotate camera vertically (X-axis) - player body rotates in FixedUpdate
+        
+        // Accumulate for physics to consume
+        accumulatedHorizontalInput += mouseX;
+        
+        // Camera rotation happens immediately in LateUpdate (correct)
         verticalRotation -= mouseY;
         verticalRotation = Mathf.Clamp(verticalRotation, -90f, 90f);
-        
         transform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
     }
+
+    public float ConsumeHorizontalInput()
+    {
+        float input = accumulatedHorizontalInput;
+        accumulatedHorizontalInput = 0f;
+        return input;
+    }
+
+    // PlayerMovement.FixedUpdate():
+    float horizontalLookInput = playerCamera.ConsumeHorizontalInput();
+
 }
