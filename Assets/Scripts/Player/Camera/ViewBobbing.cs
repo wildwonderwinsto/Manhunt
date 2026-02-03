@@ -90,9 +90,13 @@ public class ViewBobbing : MonoBehaviour
         
         if (cameraTransform == null)
         {
-            // Try to get camera from this GameObject
-            cameraTransform = GetComponent<Camera>()?.transform;
-            if (cameraTransform == null)
+            // CORRECT:
+            Camera cam = GetComponentInChildren<Camera>();
+            if (cam != null)
+            {
+                cameraTransform = cam.transform;
+            }
+            else
             {
                 Debug.LogError("[ViewBobbing] CameraTransform reference missing! Assign in Inspector.", this);
             }

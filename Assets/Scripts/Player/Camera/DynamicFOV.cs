@@ -11,6 +11,7 @@ public class DynamicFOV : MonoBehaviour
     [Header("References")]
     [SerializeField] private Rigidbody playerRigidbody; // ✅ Assign in Inspector
     [SerializeField] private PlayerMovement playerMovement; // ✅ Assign in Inspector
+    [SerializeField] private CameraImpact cameraImpact; // ✅ ADD THIS
 
     private Camera cam;
     
@@ -20,10 +21,19 @@ public class DynamicFOV : MonoBehaviour
     {
         cam = GetComponent<Camera>();
         
+        if (cam == null)
+        {
+            Debug.LogError("[DynamicFOV] This script must be attached to a GameObject with a Camera component!", this);
+            enabled = false; // Disable script to prevent errors
+            return;
+        }
+
         // Validate references
         if (playerRigidbody == null)
         {
             Debug.LogError("DynamicFOV: Player Rigidbody reference is missing! Assign in Inspector.");
+            enabled = false;
+            return;
         }
         
         if (playerMovement == null)
@@ -51,6 +61,15 @@ public class DynamicFOV : MonoBehaviour
         else
             targetFOV = maxFOV;
 
-        cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetFOV, Time.deltaTime * fovLerpSpeed);
+        // Apply impact offset if CameraImpact exists
+        float impactOffset = 0f;
+        if (cameraImpact != null)
+        {
+            impactOffset = cameraImpact.CurrentFOVOffset;
+        }
+
+        // Lerp to target, then apply impact offset
+        float smoothedFOV = Mathf.Lerp(cam.fieldOfView, targetFOV, Time.deltaTime * fovLerpSpeed);
+        cam.fieldOfView = smoothedFOV + impactOffset;
     }
 }

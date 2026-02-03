@@ -66,10 +66,32 @@ public class CameraSmoothing : MonoBehaviour
     // ===== INITIALIZATION =====
     private void Awake()
     {
-        // Get the child transform (the next level down in hierarchy)
+        // Find child transform (prefer one with camera effects or Camera component)
         if (transform.childCount > 0)
         {
-            childTransform = transform.GetChild(0);
+            // Strategy 1: Find child with ViewBobbing, CameraTilt, or Camera
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                Transform child = transform.GetChild(i);
+                
+                // Check if this child has camera-related components
+                if (child.GetComponent<ViewBobbing>() != null || 
+                    child.GetComponent<CameraTilt>() != null ||
+                    child.GetComponent<CameraImpact>() != null ||
+                    child.GetComponentInChildren<Camera>() != null)
+                {
+                    childTransform = child;
+                    break;
+                }
+            }
+            
+            // Fallback: use first child if no camera components found
+            if (childTransform == null)
+            {
+                childTransform = transform.GetChild(0);
+                Debug.LogWarning("[CameraSmoothing] Using first child, but no camera components detected. Verify hierarchy.", this);
+            }
+            
             childOriginalLocalPosition = childTransform.localPosition;
             childOriginalLocalRotation = childTransform.localRotation;
         }

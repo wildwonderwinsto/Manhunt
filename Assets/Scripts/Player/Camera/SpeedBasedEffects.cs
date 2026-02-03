@@ -103,7 +103,17 @@ public class SpeedBasedEffects : MonoBehaviour
         
         if (cameraTransform == null)
         {
-            Debug.LogError("[SpeedBasedEffects] CameraTransform reference missing! Assign in Inspector.", this);
+            // Try to find camera in children
+            Camera cam = GetComponentInChildren<Camera>();
+            if (cam != null)
+            {
+                cameraTransform = cam.transform;
+                Debug.LogWarning("[SpeedBasedEffects] CameraTransform auto-assigned from children.", this);
+            }
+            else
+            {
+                Debug.LogError("[SpeedBasedEffects] CameraTransform reference missing! Assign in Inspector.", this);
+            }
         }
 
         // Pre-calculate alignment threshold (angle to cosine)

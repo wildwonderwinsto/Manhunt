@@ -70,8 +70,8 @@ public class CameraImpact : MonoBehaviour
     [SerializeField, Tooltip("GroundCheck component (optional - will auto-find)")]
     private GroundCheck groundCheck;
     
-    [SerializeField, Tooltip("Camera component for FOV punch (optional)")]
-    private Camera cameraComponent;
+    // PUBLIC property for DynamicFOV to read
+    public float CurrentFOVOffset { get; private set; }
 
     // ===== CACHED PHYSICS DATA (updated in FixedUpdate) =====
     private bool wasGroundedLastFrame;
@@ -86,7 +86,6 @@ public class CameraImpact : MonoBehaviour
 
     // ===== RUNTIME STATE: FOV PUNCH =====
     private float currentFOVOffset;           // Current FOV delta
-    private float baseFOV;                    // Original FOV to return to
 
     // ===== RUNTIME STATE: ROTATION IMPACT =====
     private float currentPitchOffset;         // Current X-axis rotation delta
@@ -124,20 +123,7 @@ public class CameraImpact : MonoBehaviour
             }
         }
 
-        // Auto-find Camera if FOV punch is enabled
-        if (useFOVPunch && cameraComponent == null)
-        {
-            cameraComponent = GetComponentInChildren<Camera>();
-            if (cameraComponent == null)
-            {
-                Debug.LogWarning("[CameraImpact] Camera not found. FOV punch disabled.", this);
-                useFOVPunch = false;
-            }
-            else
-            {
-                baseFOV = cameraComponent.fieldOfView;
-            }
-        }
+
 
         // Initialize state
         wasGroundedLastFrame = true;
@@ -325,14 +311,13 @@ public class CameraImpact : MonoBehaviour
     // ===== FOV PUNCH UPDATE =====
     private void UpdateFOVPunch()
     {
-        if (cameraComponent == null) return;
+        if (!useFOVPunch) return;
 
-        // Smoothly return FOV to base
+        // Smoothly return FOV offset to zero
         float lerpFactor = 1f - Mathf.Exp(-fovRecoverySpeed * Time.deltaTime);
         currentFOVOffset = Mathf.Lerp(currentFOVOffset, 0f, lerpFactor);
-
-        // Apply FOV
-        cameraComponent.fieldOfView = baseFOV + currentFOVOffset;
+        
+        CurrentFOVOffset = currentFOVOffset; // Expose to public property
     }
 
     // ===== ROTATION IMPACT UPDATE =====
@@ -410,10 +395,7 @@ public class CameraImpact : MonoBehaviour
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
         
-        if (cameraComponent != null)
-        {
-            cameraComponent.fieldOfView = baseFOV;
-        }
+
     }
 
     /// <summary>
@@ -438,9 +420,8 @@ public class CameraImpact : MonoBehaviour
     public void SetFOVPunchEnabled(bool enabled)
     {
         useFOVPunch = enabled;
-        if (!enabled && cameraComponent != null)
+        if (!enabled)
         {
-            cameraComponent.fieldOfView = baseFOV;
             currentFOVOffset = 0f;
         }
     }

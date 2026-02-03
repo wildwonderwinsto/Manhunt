@@ -108,8 +108,13 @@ public class CameraTilt : MonoBehaviour
         
         if (cameraTransform == null)
         {
-            cameraTransform = GetComponent<Camera>()?.transform;
-            if (cameraTransform == null)
+            // CORRECT:
+            Camera cam = GetComponentInChildren<Camera>();
+            if (cam != null)
+            {
+                cameraTransform = cam.transform;
+            }
+            else
             {
                 Debug.LogError("[CameraTilt] CameraTransform reference missing!", this);
             }

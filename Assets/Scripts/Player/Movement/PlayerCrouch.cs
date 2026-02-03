@@ -40,7 +40,9 @@ public class PlayerCrouch : MonoBehaviour
         }
 
         // Smoothly lerp camera height
-        currentCameraHeight = Mathf.Lerp(currentCameraHeight, targetCameraHeight, Time.deltaTime * crouchSpeed);
+        // Better (frame-rate independent):
+        float lerpFactor = 1f - Mathf.Exp(-crouchSpeed * Time.deltaTime);
+        currentCameraHeight = Mathf.Lerp(currentCameraHeight, targetCameraHeight, lerpFactor);
         cameraHolder.localPosition = new Vector3(0f, currentCameraHeight, 0f);
     }
 
