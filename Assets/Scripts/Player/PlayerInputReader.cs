@@ -12,12 +12,19 @@ public class PlayerInputReader : MonoBehaviour
     private float lastJumpPressTime;
 
     void OnMove(InputValue value) => MoveInput = value.Get<Vector2>();
-    void OnLook(InputValue value) => LookInput = value.Get<Vector2>();
-    void OnJump(InputValue value) => JumpPressed = value.isPressed;
+    void OnLook(InputValue value) => LookInput = value.Get<Vector2>();   
     void OnSprint(InputValue value) => SprintHeld = value.isPressed;
     void OnCrouch(InputValue value) => CrouchPressed = value.isPressed;
 
-        // Use InputAction.CallbackContext's timing info
+    void OnJump(InputValue value)
+    {
+        JumpPressed = value.isPressed;
+        if (value.isPressed)
+        {
+            lastJumpPressTime = Time.time;
+        }
+    }
+
     public bool WasJumpPressedThisPhysicsStep()
     {
         return JumpPressed && lastJumpPressTime >= Time.fixedTime - Time.fixedDeltaTime;

@@ -32,10 +32,9 @@ public class PlayerJump : MonoBehaviour
     {
         if (inputReader == null) return;
 
-        // Track when we were last grounded for coyote time (use fixedTime for consistency)
+        // Track frames since grounded
         if (groundCheck.IsGrounded(rb))
         {
-            lastGroundedTime = Time.fixedTime;
             framesSinceGrounded = 0;
         }
         else
@@ -46,19 +45,15 @@ public class PlayerJump : MonoBehaviour
         // Process jump when button is pressed
         if (inputReader.JumpPressed)
         {
-            inputReader.ConsumeJump(); // Consume immediately
+            inputReader.ConsumeJump();
             
-            float timeSinceGrounded = Time.fixedTime - lastGroundedTime;
-            
-            // Allow jump if grounded or within coyote time
+            // Allow jump if within coyote frames
             if (framesSinceGrounded <= coyoteFrames)
             {
-                // Instant jump - set velocity.y directly (NO ALLOCATION)
                 jumpVelocity = rb.linearVelocity;
                 jumpVelocity.y = jumpForce;
                 rb.linearVelocity = jumpVelocity;
                 
-                // Call momentum system if sprinting
                 playerMovement?.AddSprintJumpMomentum();
             }
         }

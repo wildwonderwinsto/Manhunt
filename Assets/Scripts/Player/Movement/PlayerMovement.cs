@@ -12,7 +12,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Settings")]
     [SerializeField, Range(1f, 10f)] private float walkSpeed = 7f;
     [SerializeField, Range(5f, 15f)] private float sprintSpeed = 10f;
-    [SerializeField, Range(0.1f, 1f)] private float acceleration = 0.2f;
+    [SerializeField, Range(0.05f, 0.5f)] private float accelerationTime = 0.1f;
 
     private Vector3 targetVelocity;
     private Vector3 currentVelocity; // Cached to avoid allocations
@@ -24,7 +24,7 @@ public class PlayerMovement : MonoBehaviour
     private const float MAX_MOMENTUM_STACKS = 3f;
     private float groundedTimer = 0f;
 
-    [SerializeField, Range(0.05f, 0.5f)] private float accelerationTime = 0.1f;
+    
     
     
 
@@ -115,10 +115,9 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleMomentumDecay()
     {
-        if (groundCheck.IsGrounded())
+        if (groundCheck.IsGrounded(rb)) // ✅ Pass rb parameter
         {
             groundedTimer += Time.fixedDeltaTime;
-            // Decay momentum after 1 second on ground
             if (groundedTimer >= 1f && momentumBoost > 0f)
             {
                 momentumBoost = 0f;

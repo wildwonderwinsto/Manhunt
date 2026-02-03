@@ -10,7 +10,7 @@ public class GroundCheck : MonoBehaviour
     private float capsuleRadius;
     private Vector3 capsuleBottom;
     private bool isGroundedCached; // Cache for gizmos
-    private Vector3 physicsPosition;
+    
 
     private void Awake()
     {
@@ -19,11 +19,6 @@ public class GroundCheck : MonoBehaviour
         {
             capsuleRadius = capsuleCollider.radius * 0.9f; // Slightly smaller for better detection
         }
-    }
-
-    void FixedUpdate() // Add to GroundCheck
-    {
-        physicsPosition = transform.position;
     }
 
     public bool IsGrounded(Rigidbody rb)
