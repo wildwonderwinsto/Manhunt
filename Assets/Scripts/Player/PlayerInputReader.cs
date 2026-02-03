@@ -29,8 +29,5 @@ public class PlayerInputReader : MonoBehaviour
     public void ConsumeJump() => JumpPressed = false;
     public void ConsumeCrouch() => CrouchPressed = false;
 
-    public bool WasJumpPressedThisPhysicsStep()
-    {
-        return JumpPressed && lastJumpPressTime >= Time.fixedTime - Time.fixedDeltaTime;
-    }
+    
 }

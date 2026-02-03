@@ -13,7 +13,7 @@ public class DynamicFOV : MonoBehaviour
     [SerializeField] private PlayerMovement playerMovement; // ✅ Assign in Inspector
 
     private Camera cam;
-    private Vector3 horizontalVelocity; // Cached to avoid allocation
+    
     private float currentSpeed;
 
     private void Start()
