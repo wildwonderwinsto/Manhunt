@@ -16,9 +16,12 @@ public class PlayerInputReader : MonoBehaviour
     void OnSprint(InputValue value) => SprintHeld = value.isPressed;
     void OnCrouch(InputValue value) => CrouchPressed = value.isPressed;
 
+    public bool JumpHeld { get; private set; } // ✅ Added for variable gravity
+
     void OnJump(InputValue value)
     {
         JumpPressed = value.isPressed;
+        JumpHeld = value.isPressed; // ✅ Track held state separate from trigger
         if (value.isPressed)
         {
             lastJumpPressTime = Time.time;

@@ -280,15 +280,11 @@ public class CameraImpact : MonoBehaviour
         }
 
         // Spring force: F = -k*x - c*v - g
-        // k = spring constant (stiffness)
-        // c = damping coefficient
-        // x = displacement from rest
-        // v = velocity
-        // g = additional gravity pull
-
         float springForce = -springStiffness * currentOffset;
         float dampingForce = -springDamping * offsetVelocity;
-        float gravityForce = -springGravity;
+        
+        // Fix (important): Only apply springGravity while airborne or only when offset > 0
+        float gravityForce = currentOffset > 0f ? -springGravity : 0f;
 
         float totalForce = springForce + dampingForce + gravityForce;
 
@@ -299,8 +295,8 @@ public class CameraImpact : MonoBehaviour
         // Clamp to prevent extreme values
         currentOffset = Mathf.Clamp(currentOffset, -maxImpactOffset * 2f, maxImpactOffset * 0.5f);
 
-        // Check if spring has settled
-        if (Mathf.Abs(currentOffset) < 0.001f && Mathf.Abs(offsetVelocity) < 0.01f)
+        // Check if spring has settled (raised thresholds)
+        if (Mathf.Abs(currentOffset) < 0.002f && Mathf.Abs(offsetVelocity) < 0.02f)
         {
             hasActiveImpact = false;
             currentOffset = 0f;
@@ -474,7 +470,7 @@ public class CameraImpact : MonoBehaviour
 
         // Draw spring displacement
         Gizmos.color = hasActiveImpact ? Color.red : Color.green;
-        Gizmos.DrawRay(origin, Vector3.up * currentOffset * 10f);
+        Gizmos.DrawLine(origin, origin + transform.up * currentOffset);
 
         // Draw impact sphere (size = displacement)
         Gizmos.color = new Color(1f, 0.5f, 0f, 0.5f);
@@ -485,7 +481,7 @@ public class CameraImpact : MonoBehaviour
         if (Mathf.Abs(offsetVelocity) > 0.01f)
         {
             Gizmos.color = Color.cyan;
-            Gizmos.DrawRay(origin, Vector3.up * offsetVelocity);
+            Gizmos.DrawRay(origin, transform.up * offsetVelocity * 0.05f);
         }
     }
     #endif

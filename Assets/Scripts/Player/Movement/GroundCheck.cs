@@ -17,7 +17,7 @@ public class GroundCheck : MonoBehaviour
         capsuleCollider = GetComponent<CapsuleCollider>();
         if (capsuleCollider != null)
         {
-            capsuleRadius = capsuleCollider.radius * 0.9f; // Slightly smaller for better detection
+            capsuleRadius = capsuleCollider.radius * 0.75f; // Fix: Shrink more to prevent wall sticking
         }
     }
 
@@ -27,6 +27,7 @@ public class GroundCheck : MonoBehaviour
         
         // Use Rigidbody.position directly (guaranteed to be physics position)
         capsuleBottom = rb.position + Vector3.down * (capsuleCollider.height / 2f - capsuleCollider.radius);
+        capsuleBottom += Vector3.down * 0.02f; // Fix: Bias downward to avoid wall edges
         
         isGroundedCached = Physics.SphereCast(capsuleBottom, capsuleRadius, Vector3.down, out _, checkDistance, groundLayer);
         return isGroundedCached;
@@ -39,7 +40,7 @@ public class GroundCheck : MonoBehaviour
             capsuleCollider = GetComponent<CapsuleCollider>();
             if (capsuleCollider != null)
             {
-                capsuleRadius = capsuleCollider.radius * 0.9f;
+                capsuleRadius = capsuleCollider.radius * 0.75f;
             }
         }
 

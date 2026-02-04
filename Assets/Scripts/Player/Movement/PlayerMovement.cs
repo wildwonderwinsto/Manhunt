@@ -108,6 +108,13 @@ public class PlayerMovement : MonoBehaviour
         
         // Frame-rate independent acceleration (60fps baseline)
         float lerpFactor = 1f - Mathf.Exp(-Time.fixedDeltaTime / accelerationTime);
+        
+        // Fix: Scale acceleration by air control
+        if (!groundCheck.IsGrounded(rb))
+        {
+            lerpFactor *= 0.4f; // Reduce control in air to prevent infinite strafing/wall sticking
+        }
+
         newVelocity = Vector3.Lerp(currentVelocity, targetVelocity, lerpFactor);
         
         rb.linearVelocity = new Vector3(newVelocity.x, rb.linearVelocity.y, newVelocity.z);

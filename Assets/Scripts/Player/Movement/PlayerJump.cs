@@ -29,6 +29,18 @@ public class PlayerJump : MonoBehaviour
     {
         if (inputReader == null) return;
 
+        // Fix: Modern platformer gravity
+        // Apply extra gravity when falling (removes floatiness)
+        if (rb.linearVelocity.y < 0f)
+        {
+            rb.AddForce(Vector3.up * Physics.gravity.y * 1.5f, ForceMode.Acceleration);
+        }
+        // Variable jump height: fall faster if jump released
+        else if (!inputReader.JumpHeld && rb.linearVelocity.y > 0f)
+        {
+            rb.AddForce(Vector3.up * Physics.gravity.y * 2f, ForceMode.Acceleration);
+        }
+
         if (groundCheck.IsGrounded(rb))
         {
             framesSinceGrounded = 0;
@@ -44,9 +56,8 @@ public class PlayerJump : MonoBehaviour
             
             if (framesSinceGrounded <= coyoteFrames)
             {
-                jumpVelocity = rb.linearVelocity;
-                jumpVelocity.y = jumpForce;
-                rb.linearVelocity = jumpVelocity;
+                // Fix: Apply impulse, don't overwrite
+                rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                 
                 playerMovement?.AddSprintJumpMomentum();
             }
